@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lịch Sử Mua Hàng - Gạo Ngon Việt</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-success fs-3" href="/">
+            <i class="bi bi-leaf-fill me-2"></i>GẠO GẦN GŨI
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="/sanpham">Sản phẩm</a>
+                </li>
+
+                <li class="nav-item" th:if="${khachHang != null}">
+                    <a class="nav-link fw-semibold active text-success" href="/lich-su-hoa-don">
+                        <i class="bi bi-clock-history me-1"></i>Lịch sử
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown" th:if="${khachHang != null}">
+                    <a class="nav-link dropdown-toggle fw-bold text-success bg-light rounded-pill px-3"
+                       href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-1"></i>
+                        [[${khachHang.tenKhachHang}]]
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-3 rounded-4">
+                        <li>
+                            <form th:action="@{/logout}" method="post" class="m-0 p-2">
+                                <button type="submit"
+                                        class="dropdown-item text-danger fw-bold rounded py-2">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== CONTENT ===== -->
+<div class="container py-5">
+    <div class="card border-0 shadow-lg rounded-5 overflow-hidden bg-white">
+
+        <div class="card-header bg-white border-0 py-4 px-4 px-md-5">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-receipt text-success me-2"></i>Lịch Sử Hóa Đơn
+            </h3>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                    <tr>
+                        <th class="py-3 px-4 px-md-5 text-secondary">STT</th>
+                        <th class="py-3 text-secondary">NGÀY ĐẶT</th>
+                        <th class="py-3 text-secondary">TỔNG TIỀN</th>
+                        <th class="py-3 text-secondary">TRẠNG THÁI</th>
+                        <th class="py-3 px-4 px-md-5 text-center text-secondary">MÃ QR</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <!-- ===== LOOP HOA DON ===== -->
+                    <tr th:each="hd, iter : ${dsHoaDon}">
+                        <td class="py-3 px-4 px-md-5 fw-bold" th:text="${iter.count}"></td>
+
+                        <td th:text="${#temporals.format(hd.ngayDat,'dd/MM/yyyy')}"></td>
+
+                        <td class="text-danger fw-bold fs-5"
+                            th:text="${#numbers.formatDecimal(hd.tongTien,0,'COMMA',0,'POINT')} + ' đ'">
+                        </td>
+
+                        <td>
+                            <span class="badge rounded-pill px-3 py-2 fw-bold"
+                                  th:classappend="${hd.trangThai.contains('thanh toán')
+                                  ? 'bg-success-subtle text-success'
+                                  : 'bg-warning-subtle text-warning'}"
+                                  th:text="${hd.trangThai}">
+                            </span>
+                        </td>
+
+                        <!-- ===== QR CODE (CHỈ DÙNG STT) ===== -->
+                        <td class="text-center px-4 px-md-5">
+                            <img
+                                    th:src="@{'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data='
+                                + ${#uris.escapeQueryParam(
+                                    'HoaDon STT:' + iter.count
+                                    + '|Ngay:' + #temporals.format(hd.ngayDat,'dd/MM/yyyy')
+                                    + '|TongTien:' + hd.tongTien
+                                )}}"
+                                    alt="QR Hóa Đơn"
+                                    class="img-thumbnail rounded-4 shadow-sm"
+                            />
+                        </td>
+                    </tr>
+
+                    <!-- ===== EMPTY ===== -->
+                    <tr th:if="${#lists.isEmpty(dsHoaDon)}">
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-cart-x display-1 d-block mb-3 opacity-25"></i>
+                            Bạn chưa thực hiện giao dịch nào.
+                            <a href="/sanpham" class="text-success fw-bold">Mua ngay!</a>
+                        </td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

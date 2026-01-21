@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm Danh Mục Mới</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="card shadow-sm col-md-6 mx-auto">
+        <div class="card-header bg-primary text-white text-center fw-bold">THÊM DANH MỤC SẢN PHẨM</div>
+        <div class="card-body">
+            <form th:action="@{/admin/them-danh-muc}" th:object="${danhMuc}" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Tên danh mục (VD: Gạo, Nước Mắm...)</label>
+                    <input type="text" th:field="*{tenDanhMuc}" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">XÁC NHẬN THÊM</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
